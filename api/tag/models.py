@@ -8,7 +8,7 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     date_created = db.Column(db.Date, nullable=False)
-    author_id = db.Column(db.Intger, db.ForeignKey("account.id", on_delete="cascade"), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey("cn_account.id", ondelete="cascade"), nullable=False)
 
     @property
     def author(self):
@@ -20,6 +20,11 @@ class TagSchema(Schema):
     date_created = fields.Date(required=True)
 
 
-class NoteTags(db.Model):
+class NoteTag(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     note_id = db.Column(db.Integer, db.ForeignKey("cn_note.id"), nullable=True)
-    tag_id = db.Column(db.Integer, db.ForeignKey("cn_tag.id"), nullabe=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey("cn_tag.id"), nullable=True)
+
+    @classmethod
+    def find_note_tag(cls, note_id, tag_id):
+        return cls.query.filter_by(note_id=note_id, tag_id=tag_id)

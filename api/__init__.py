@@ -20,4 +20,10 @@ def create_app() -> Flask:
     cors.init_app(app)
     jwt.init_app(app)
 
+    # Loading app blueprints
+    from api.account.controllers import account
+    from api.note.controllers import note
+    from api.tag.controllers import tag
+
+
     return app

@@ -8,7 +8,7 @@ class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(50), nullable=False)
-    date_created = db.Column(db.DateField())
+    date_created = db.Column(db.Date())
     password_hash = db.Column(db.String(120))
     account_type = db.Column(db.String(6), nullable=False, default="normal")
     
