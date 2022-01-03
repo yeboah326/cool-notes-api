@@ -10,29 +10,14 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(120), nullable=False)
     content = db.Column(db.Text, nullable=True)
-    created_on = db.Column(db.DateTime, default=datetime.datetime.now)
-    updated_on = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+    date_created = db.Column(db.DateTime, default=datetime.datetime.now())
+    date_updated = db.Column(db.DateTime, default=datetime.datetime.now(), onupdate=datetime.datetime.now())
     author_id = db.Column(db.Integer, db.ForeignKey("cn_account.id", ondelete="cascade"), nullable=False)
 
     @property
     def author(self) -> str:
         return Account.find_by_id(self.author_id).name
-    
-    @property
-    def date_created(self) -> str:
-        return self.created_on.strftime("%Y-%m-%d")
-    
-    @property
-    def date_updated(self) -> str:
-        return self.date_updated.strftime("%Y-%m-%d")
-    
+        
     @classmethod
     def find_note_by_id(cls,id):
         return cls.query.filter_by(id=id).first()
-
-class NoteSchema(Schema):
-    id = fields.Int(required=True, dump_only=True)
-    title = fields.Str(required=True)
-    content = fields.Str(required=False)
-    date_created =  fields.Date(dump_only=True)
-    date_updated = fields.DateTime(dump_only=True)
