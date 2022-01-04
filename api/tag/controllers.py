@@ -1,46 +1,103 @@
-from flask import Blueprint
+from flask import Blueprint, request
+from api.extensions import db
 from api.tag.models import Tag, NoteTag
-from flask_jwt_extended import jwt_required
+from api.tag.schemas import tag_schema, tags_schema
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-tag = Blueprint("tag",__name__, url_prefix="api/tag")
+tag = Blueprint("tag",__name__, url_prefix="/api/tag")
 
-# TODO: Create tag
 @tag.post("/")
 def tag_create():
-    pass
+    # Retrieve the incoming data
+    data = request.get_json()
 
-# TODO: Delete tag
+    new_tag = tag_schema.dump(data)
+    return {"message": f"{data['name']} created successfully"}, 200
+
 @tag.delete("/id")
 @jwt_required()
 def tag_delete_by_id(id):
-    pass
+    # Retrieve the tag
+    tag = Tag.find_by_id(id)
 
-# TODO: Modify tag
-@tag.put("/id")
+    if not tag:
+        return {"message": "A tag with the given ID does not exist"}, 404
+
+    db.session.delete(tag)
+    db.session.commit()
+
+    return {"message": "Tag deleted successfully"}, 200
+
+@tag.put("/<id>")
 @jwt_required()
 def tag_update_by_id(id):
-    pass
+    """
+    id
+    new_name
+    """
+    # Retrieve the incoming data
+    data = request.get_json()
 
-# TODO: View single tag
+    # Retrieve the tag
+    tag = Tag.find_by_id(id)
+    
+    if not tag:
+        return {"message": "A tag with the given ID does not exist"}, 404
+
+    try:
+        if data["new_name"]:
+            tag.name = data["new_name"]
+            db.session.commit()
+    except KeyError:
+        pass
+
+    return {"message": "Tag updated successfully"}, 200
+
+
 @tag.get("/<id>")
 @jwt_required()
 def tag_get_by_id(id):
-    pass
+    tag = tag_schema.dump(Tag.find_by_id(id))
+    
+    if not tag:
+        return {"message": "A tag with the given ID does not exist"}, 404
 
-# TODO: View all tags
+    return {"tag": tag}, 200
+
 @tag.get("/")
 @jwt_required()
 def tag_view_all():
-    pass
+    tags = tags_schema.dump(Tag.query.filter_by(author_id=get_jwt_identity()).all())
+    return {"tags": tags}
 
-# TODO: Add tag to note
 @tag.post("/add_tag")
 @jwt_required()
 def tag_add_to_note():
-    pass
+    """
+    tag_id, note_id
+    """
+    # Retrieve the incoming data
+    data = request.get_json()
+    
+    note_tag = NoteTag(note_id=data["note_id"],tag_id=data["tag_id"])
+    db.session.add(note_tag)
+    db.session.commit()
+
+    return {"message": "Tag added to note successfully"}, 200
+
 
 # TODO: Remove tag from note
 @tag.post("/remove_tag")
 @jwt_required()
 def tag_remove_from_note():
-    pass
+    """
+    tag_id, note_id
+    """
+    # Retrieve the incoming data
+    data = request.get_json()
+    note_tag = NoteTag(note_id=data["note_id"], tag_id=data["tag_id"])
+    
+    db.session.delete(note_tag)
+    db.session.commit()
+
+    return {"message": "Tag removed from note successfully"}, 200

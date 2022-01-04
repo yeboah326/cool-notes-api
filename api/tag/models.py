@@ -15,6 +15,9 @@ class Tag(db.Model):
     def author(self):
         return Account.find_by_id(self.author_id).name
 
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id=id).first()
 class NoteTag(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     note_id = db.Column(db.Integer, db.ForeignKey("cn_note.id"), nullable=True)
