@@ -25,5 +25,10 @@ def create_app() -> Flask:
     from api.note.controllers import note
     from api.tag.controllers import tag
 
+    # Registering blueprints
+    app.register_blueprint(account)
+    app.register_blueprint(note)
+    app.register_blueprint(tag)
+
 
     return app
