@@ -1,6 +1,7 @@
 from marshmallow import Schema, fields
 import datetime
 from api.account.models import Account
+from api.tag.models import Tag, NoteTag
 from api.extensions import db
 
 
@@ -17,7 +18,13 @@ class Note(db.Model):
     @property
     def author(self) -> str:
         return Account.find_by_id(self.author_id).name
-        
+    
+    @property
+    def tags(self) -> str:
+        note_tags = NoteTag.query.filter_by(note_id=self.id).all()
+        tags = [Tag.find_by(note_tag.id) for note_tag in note_tags]
+        return tags
+    
     @classmethod
     def find_note_by_id(cls,id):
         return cls.query.filter_by(id=id).first()
