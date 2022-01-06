@@ -3,6 +3,8 @@ from api.account.models import Account
 from api.account.schemas import account_schema
 from api.note.models import Note
 from api.note.schemas import note_schema, notes_schema
+from api.tag.models import NoteTag, Tag
+from api.tag.schemas import tag_schema, tags_schema
 
 
 def truncate_db():
@@ -33,6 +35,7 @@ def create_user_login_token(client):
     )
     return response.json
 
+
 def create_note(client, token):
     response = client.post(
         "/api/note/",
@@ -41,6 +44,7 @@ def create_note(client, token):
     )
     note = note_schema.dump(Note.query.filter_by(title="Test Note 1").first())
     return note
+
 
 def create_multiple_notes(client, token):
     for i in range(3):
@@ -51,3 +55,46 @@ def create_multiple_notes(client, token):
         )
     notes = notes_schema.dump(Note.query.all())
     return notes
+
+
+def create_tag(client, user):
+    client.post(
+        "/api/tag/",
+        json={"name": "food"},
+        headers={"Authorization": f"Bearer {user['token']}"},
+    )
+
+    tag = tag_schema.dump(Tag.query.filter_by(name="food").first())
+
+    return tag
+
+
+def create_multiple_tags(client, user):
+    for i in range(3):
+        client.post(
+            "/api/tag/",
+            json={"name": f"food{i}"},
+            headers={"Authorization": f"Bearer {user['token']}"},
+        )
+
+    tags = tags_schema.dump(Tag.query.filter_by(author_id=user["account"]["id"]))
+
+    return tags
+
+
+def create_note_with_tag(client, user):
+    # Create a tag for testing
+    tag = create_tag(client, user)
+
+    # Create a new note for testing
+    note = create_note(client, user["token"])
+
+    response = client.post(
+        "api/tag/add_tag",
+        json={"note_id": note["id"], "tag_id": tag["id"]},
+        headers={"Authorization": f"Bearer {user['token']}"},
+    )
+
+    note_tag = NoteTag.query.filter_by(note_id=note["id"], tag_id=tag["id"]).first()
+
+    return note_tag
