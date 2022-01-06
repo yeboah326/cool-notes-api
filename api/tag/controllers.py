@@ -2,19 +2,29 @@ from flask import Blueprint, request
 from api.extensions import db
 from api.tag.models import Tag, NoteTag
 from api.tag.schemas import tag_schema, tags_schema
+from marshmallow.exceptions import ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 tag = Blueprint("tag",__name__, url_prefix="/api/tag")
 
 @tag.post("/")
+@jwt_required()
 def tag_create():
     # Retrieve the incoming data
     data = request.get_json()
+    data['author_id'] = get_jwt_identity()
 
-    new_tag = tag_schema.dump(data)
+    try:
+        new_tag = tag_schema.load(data)
+
+        db.session.add(new_tag)
+        db.session.commit()
+    except ValidationError as e:
+        return {"message": "Invalid data", "errors": e.messages}, 400
+
     return {"message": f"{data['name']} created successfully"}, 200
 
-@tag.delete("/id")
+@tag.delete("/<id>")
 @jwt_required()
 def tag_delete_by_id(id):
     # Retrieve the tag
@@ -49,7 +59,7 @@ def tag_update_by_id(id):
             tag.name = data["new_name"]
             db.session.commit()
     except KeyError:
-        pass
+        return {"message": "A new name was not provided for the tag"}, 400
 
     return {"message": "Tag updated successfully"}, 200
 
@@ -66,9 +76,9 @@ def tag_get_by_id(id):
 
 @tag.get("/")
 @jwt_required()
-def tag_view_all():
+def tag_get_all():
     tags = tags_schema.dump(Tag.query.filter_by(author_id=get_jwt_identity()).all())
-    return {"tags": tags}
+    return {"tags": tags}, 200
 
 @tag.post("/add_tag")
 @jwt_required()
@@ -78,7 +88,7 @@ def tag_add_to_note():
     """
     # Retrieve the incoming data
     data = request.get_json()
-    
+
     note_tag = NoteTag(note_id=data["note_id"],tag_id=data["tag_id"])
     db.session.add(note_tag)
     db.session.commit()
@@ -95,9 +105,8 @@ def tag_remove_from_note():
     """
     # Retrieve the incoming data
     data = request.get_json()
-    note_tag = NoteTag(note_id=data["note_id"], tag_id=data["tag_id"])
+    db.session.query(NoteTag).filter_by(note_id=data["note_id"], tag_id=data["tag_id"]).delete()
     
-    db.session.delete(note_tag)
     db.session.commit()
 
     return {"message": "Tag removed from note successfully"}, 200
