@@ -1,6 +1,7 @@
 from marshmallow import Schema, fields
 import datetime
 from api.account.models import Account
+from api.tag.models import Tag, NoteTag
 from api.extensions import db
 
 
@@ -10,25 +11,20 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(120), nullable=False)
     content = db.Column(db.Text, nullable=True)
-    created_on = db.Colum(db.DateTime, default=datetime.datetime.now)
-    updated_on = db.Column(db.DateTime, onupdate=datetime.datetime.now)
-    author_id = db.Column(db.Intger, db.ForeignKey("account.id", on_delete="cascade"), nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.datetime.now())
+    date_updated = db.Column(db.DateTime, default=datetime.datetime.now(), onupdate=datetime.datetime.now())
+    author_id = db.Column(db.Integer, db.ForeignKey("cn_account.id", ondelete="cascade"), nullable=False)
 
     @property
     def author(self) -> str:
         return Account.find_by_id(self.author_id).name
     
     @property
-    def date_created(self) -> str:
-        return self.created_on.strftime("%Y-%m-%d")
+    def tags(self) -> str:
+        note_tags = NoteTag.query.filter_by(note_id=self.id).all()
+        tags = [Tag.find_by(note_tag.id) for note_tag in note_tags]
+        return tags
     
-    @property
-    def date_updated(self) -> str:
-        return self.date_updated.strftime("%Y-%m-%d")
-
-class NoteSchema(Schema):
-    id = fields.Int(required=True, dump_only=True)
-    title = fields.Str(required=True)
-    content = fields.Str(required=False)
-    date_created =  fields.Date(dump_only=True)
-    date_updated = fields.DateTime(dump_only=True)
+    @classmethod
+    def find_note_by_id(cls,id):
+        return cls.query.filter_by(id=id).first()
