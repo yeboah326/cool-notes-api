@@ -10,6 +10,9 @@ account = Blueprint("account",__name__, url_prefix="/api/account")
 
 @account.post("/")
 def account_create():
+    """
+    name, email, password
+    """
     # Retrieve the incoming data
     data = request.get_json()
 
@@ -34,14 +37,14 @@ def account_authenticate():
 
     try:
         # Retrive user instance
-        account = Account.find_by_email(data["email"])
+        account = account_login_schema.load(data)
 
         if account:
             password_correct = account.check_password(data["password"])
             if password_correct:
                 token = create_access_token(identity=account.id)
                 return {"token": token, "account": account_schema.dump(account)}, 200
-    
+            return {"message": "Either the username or password is invalid"}, 400
     except ValidationError as e:
         return {"message": "Invalid data", "errors": e.messages}, 400
 

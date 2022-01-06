@@ -15,3 +15,13 @@ class AccountSchema(Schema):
 
 account_schema = AccountSchema(unknown="EXCLUDE")
 accounts_schema = AccountSchema(many=True, unknown="EXCLUDE")
+
+class AccountLoginSchema(Schema):
+    email = fields.Email(required=True)
+    password = fields.Str(required=True)
+
+    @post_load
+    def return_account(self, data, **kwargs):
+        return Account.find_by_email(data["email"])
+
+account_login_schema = AccountLoginSchema(unknown="EXCLUDE")
