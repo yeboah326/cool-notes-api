@@ -69,17 +69,13 @@ def note_delete_by_id(id):
 @note.delete("/")
 @jwt_required()
 def note_delete_by_all():
-    # Retrieve the note
-    note = Note.find_note_by_id(id)
+    # Retrieve the notes
+    db.session.query(Note).filter_by(author_id=get_jwt_identity()).delete()
 
-    if not note:
-        return {"message": "A note with the given ID does not exist"}, 404
-
-    # Delete the note
-    db.session.delete(note)
+    # Delete the notes
     db.session.commit()
 
-    return {"message": "Note deleted successfully"}, 200
+    return {"message": "Notes deleted successfully"}, 200
 
 
 @note.get("/")

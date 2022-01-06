@@ -1,6 +1,7 @@
 import pytest
 from api import create_app, db
 
+
 @pytest.fixture
 def app():
     flask_app = create_app()
