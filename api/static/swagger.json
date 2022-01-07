@@ -1,0 +1,330 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a simple CRUD API for a note taking application that supports tags too.",
+    "version": "1.0.0",
+    "title": "Cool Notes",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "asanteg36@gmail.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "cool-notes-api.herokuapp.com",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "account",
+      "description": "Everything about user accounts"
+    },
+    {
+      "name": "note",
+      "description": "Everything about notes"
+    },
+    {
+      "name": "tag",
+      "description": "Everything about tags"
+    }
+  ],
+  "schemes": ["https"],
+  "paths": {
+    "/account/": {
+      "post": {
+        "tags": ["account"],
+        "summary": "Create a new user account",
+        "description": "This does not require the user to be logged in",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AccountLoad"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User account for {name} has been created successfully",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          },
+          "400": {
+            "description": "A user with the given email already exists",
+            "schema": { "$ref": "#/definitions/GenericResponse" }
+          },
+          "422": {
+            "description": "Invalid data",
+            "schema": { "$ref": "#/definitions/ValidationError" }
+          }
+        }
+      },
+      "get": {
+        "tags": ["account"],
+        "summary": "Get all user accounts",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AccountDump"
+              }
+            }
+          },
+          "401": {
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          }
+        }
+      }
+    },
+    "/account/auth": {
+      "post": {
+        "tags": ["account"],
+        "summary": "Generate bearer token for the user",
+        "description": "This does not require the user to be logged in",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AccountLogin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "schema": {
+              "$ref": "#/definitions/AccountAuthorized"
+            }
+          },
+          "422": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          },
+          "400": {
+            "description": "Either username or password is wrong",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          }
+        }
+      }
+    },
+    "/note/": {
+      "post": {
+        "tags": ["note"],
+        "summary": "Create a new note for the user",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      },
+      "delete": {
+        "tags": ["note"],
+        "summary": "Delete all notes for the user",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      },
+      "get": {
+        "tags": ["note"],
+        "summary": "Get all notes for the user",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      }
+    },
+    "note/{id}": {
+      "put": {
+        "tags": ["note"],
+        "summary": "Update existing note",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      },
+      "delete": {
+        "tags": ["note"],
+        "summary": "Delete an existing note",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      },
+      "get": {
+        "tags": ["note"],
+        "summary": "Get an existing note",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      }
+    },
+    "/tag/": {
+      "post": {
+        "tags": ["tag"],
+        "summary": "Create a new tag",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      },
+      "get": {
+        "tags": ["tag"],
+        "summary": "Get all tags for the user",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      }
+    },
+    "/tag/{id}": {
+      "delete": {
+        "tags": ["tag"],
+        "summary": "Delete an existing tag",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      },
+      "put": {
+        "tags": ["tag"],
+        "summary": "Update an existing tag",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      },
+      "get": {
+        "tags": ["tag"],
+        "summary": "Get an existing tag",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      }
+    },
+    "/tag/add_tag": {
+      "post": {
+        "tags": ["tag"],
+        "summary": "Add tag to note",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      }
+    },
+    "/tag/remove_tag": {
+      "post": {
+        "tags": ["tag"],
+        "summary": "Remove tag from note",
+        "description": "This can only be done by the logged in user.",
+        "produces": ["application/json"]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "petstore_auth": {
+      "type": "oauth2",
+      "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
+      "flow": "implicit",
+      "scopes": {
+        "write:pets": "modify pets in your account",
+        "read:pets": "read your pets"
+      }
+    },
+    "api_key": {
+      "type": "apiKey",
+      "name": "api_key",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "properties": {
+        "field": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "GenericResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "ValidationError": {
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" },
+        "errors": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Error" }
+        }
+      }
+    },
+    "AccountLoad": {
+      "type": "object",
+      "required": ["name", "email", "account_type", "password"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "John Doe"
+        },
+        "email": {
+          "type": "string",
+          "example": "jdoe@email.com"
+        },
+        "account_type": {
+          "type": "string",
+          "enum": ["normal", "super"],
+          "example": "normal"
+        },
+        "password": {
+          "type": "string",
+          "example": "123456789"
+        }
+      }
+    },
+    "AccountDump": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "date_created": { "type": "date" },
+        "date_updated": { "type": "date" },
+        "account_type": { "type": "string" }
+      }
+    },
+    "AccountLogin": {
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "example": "jdoe@email.com" },
+        "password": { "type": "string", "example": "123456789" }
+      }
+    },
+    "AccountAuthorized": {
+      "type": "object",
+      "properties": {
+        "token": { "type": "string" },
+        "account": {
+          "$ref": "#/definitions/AccountDump"
+        }
+      }
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {}
+    },
+    "Note": {
+      "type": "object",
+      "properties": {}
+    }
+  }
+}

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from .config import config_dict
 import os
 from dotenv import load_dotenv
@@ -29,6 +29,11 @@ def create_app() -> Flask:
     app.register_blueprint(account)
     app.register_blueprint(note)
     app.register_blueprint(tag)
+
+    # Add documentation url
+    @app.route('/api/docs/')
+    def get_docs():
+        return render_template('swaggerui.html')
 
 
     return app

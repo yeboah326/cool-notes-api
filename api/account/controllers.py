@@ -17,6 +17,9 @@ def account_create():
     data = request.get_json()
 
     try:
+        account = Account.find_by_email(data['email'])
+        if account:
+            return {"message": "A user with the given email exists"}, 400
         # Create the account instance
         new_account = account_schema.load(data)
         new_account.password = data["password"]
@@ -28,7 +31,7 @@ def account_create():
         return {"message": f"User account for {data['name']} created successfully"}, 200
 
     except ValidationError as e:
-        return {"message": "Invalid data", "errors": e.messages}, 400
+        return {"message": "Invalid data", "errors": e.messages}, 422
 
 @account.post("/auth")
 def account_authenticate():
@@ -46,7 +49,7 @@ def account_authenticate():
                 return {"token": token, "account": account_schema.dump(account)}, 200
             return {"message": "Either the username or password is invalid"}, 400
     except ValidationError as e:
-        return {"message": "Invalid data", "errors": e.messages}, 400
+        return {"message": "Invalid data", "errors": e.messages}, 422
 
 @account.get("/")
 @jwt_required()
