@@ -40,7 +40,7 @@ def test_tag_create_error(client):
         headers={"Authorization": f"Bearer {user['token']}"},
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert response.json["message"] == "Invalid data"
     assert response.json["errors"] == {"name": ["Missing data for required field."]}
 

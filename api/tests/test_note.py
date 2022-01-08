@@ -44,7 +44,7 @@ def test_note_create_error(client):
     # Try to retrieve note instance
     note = note_schema.dump(Note.query.filter_by(title="Test Note 1").first())
 
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert response.json["errors"] == {"title": ["Missing data for required field."]}
     assert response.json["messages"] == "Invalid data"
     assert note == {}

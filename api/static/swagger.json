@@ -136,39 +136,188 @@
         "tags": ["note"],
         "summary": "Create a new note for the user",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NoteLoad"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Note created successfully",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          },
+          "422": {
+            "description": "Invalid data",
+            "schema": {
+              "$ref": "#/definitions/ValidationError"
+            }
+          }
+        }
       },
       "delete": {
         "tags": ["note"],
         "summary": "Delete all notes for the user",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All notes deleted successfully",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          }
+        }
       },
       "get": {
         "tags": ["note"],
         "summary": "Get all notes for the user",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get all the created tags",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NoteDump"
+              }
+            }
+          }
+        }
       }
     },
-    "note/{id}": {
+    "/note/{id}": {
       "put": {
         "tags": ["note"],
         "summary": "Update existing note",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Created user object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NoteUpdateLoad"
+            }
+          },
+          {
+            "in": "path",
+            "name": "note_id",
+            "description": "A note id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Note update successful",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          },
+          "404": {
+            "description": "A note with the given ID does not exist",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          }
+        }
       },
       "delete": {
         "tags": ["note"],
         "summary": "Delete an existing note",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "note_id",
+            "description": "A note id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Note deleted successfully",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          },
+          "404": {
+            "description": "A note with the given ID does not exist",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          }
+        }
       },
       "get": {
         "tags": ["note"],
         "summary": "Get an existing note",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "note_id",
+            "description": "A note id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "$ref": "#/definitions/NoteDump"
+            }
+          },
+          "404": {
+            "description": "A note with the given ID does not exist",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          }
+        }
       }
     },
     "/tag/": {
@@ -176,13 +325,55 @@
         "tags": ["tag"],
         "summary": "Create a new tag",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "New tag object",
+            "schema": {
+              "$ref": "#/definitions/TagLoad"
+            },
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{name} created successfully",
+            "schema": { "$ref": "#/definitions/GenericResponse" }
+          },
+          "422": {
+            "description": "Invalid data",
+            "schema": { "$ref": "#/definitions/ValidationError" }
+          }
+        }
       },
       "get": {
         "tags": ["tag"],
         "summary": "Get all tags for the user",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TagDump"
+              }
+            }
+          }
+        }
       }
     },
     "/tag/{id}": {
@@ -190,19 +381,99 @@
         "tags": ["tag"],
         "summary": "Delete an existing tag",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tag_id",
+            "description": "A tag id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag deleted successfully",
+            "schema": { "$ref": "#/definitions/GenericResponse" }
+          },
+          "404": {
+            "description": "A tag with the given ID does not exist",
+            "schema": { "$ref": "#/definitions/GenericResponse" }
+          }
+        }
       },
       "put": {
         "tags": ["tag"],
         "summary": "Update an existing tag",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tag_id",
+            "description": "A tag id",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "A new tag object",
+            "required": true,
+            "schema": { "$ref": "#/definitions/TagLoadUpdate" }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag updated successfully",
+            "schema": { "$ref": "#/definitions/GenericResponse" }
+          },
+          "404": {
+            "description": "A tag with the given ID does not exist",
+            "schema": { "$ref": "#/definitions/GenericResponse" }
+          },
+          "422": {
+            "description": "A new name was not provided for the tag",
+            "schema": { "$ref": "#/definitions/GenericResponse" }
+          }
+        }
       },
       "get": {
         "tags": ["tag"],
         "summary": "Get an existing tag",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tag_id",
+            "description": "A tag id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Succesful",
+            "schema": { "$ref": "#/definitions/TagDump" }
+          },
+          "404": {
+            "description": "A tag with the given ID does not exist",
+            "schema": { "$ref": "#/definitions/GenericResponse" }
+          }
+        }
       }
     },
     "/tag/add_tag": {
@@ -210,7 +481,31 @@
         "tags": ["tag"],
         "summary": "Add tag to note",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "note_tag",
+            "description": "A note tag",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NoteTag"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag added to note successfully",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          }
+        }
       }
     },
     "/tag/remove_tag": {
@@ -218,7 +513,31 @@
         "tags": ["tag"],
         "summary": "Remove tag from note",
         "description": "This can only be done by the logged in user.",
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "note_tag",
+            "description": "A note tag",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NoteTag"
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag removed successfully",
+            "schema": {
+              "$ref": "#/definitions/GenericResponse"
+            }
+          }
+        }
       }
     }
   },
@@ -297,8 +616,8 @@
         "id": { "type": "integer" },
         "name": { "type": "string" },
         "email": { "type": "string" },
-        "date_created": { "type": "date" },
-        "date_updated": { "type": "date" },
+        "date_created": { "type": "string" },
+        "date_updated": { "type": "string" },
         "account_type": { "type": "string" }
       }
     },
@@ -318,13 +637,59 @@
         }
       }
     },
-    "Tag": {
+    "NoteDump": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "id": { "type": "integer" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "author_id": { "type": "integer" },
+        "author": { "type": "string" },
+        "date_created": { "type": "string" },
+        "date_updated": { "type": "string" }
+      }
     },
-    "Note": {
+    "NoteLoad": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" }
+      }
+    },
+    "NoteUpdateLoad": {
+      "type": "object",
+      "properties": {
+        "new_title": { "type": "string" },
+        "new_content": { "type": "string" }
+      }
+    },
+    "TagLoad": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      }
+    },
+    "TagLoadUpdate": {
+      "type": "object",
+      "properties": {
+        "new_name": { "type": "string" }
+      }
+    },
+    "TagDump": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "author_id": { "type": "integer" },
+        "date_created": { "type": "string" }
+      }
+    },
+    "NoteTag": {
+      "type": "object",
+      "properties": {
+        "note_id": { "type": "integer" },
+        "tag_id": { "type": "integer" }
+      }
     }
   }
 }
