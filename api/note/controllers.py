@@ -25,7 +25,7 @@ def note_create():
         return {"message": "Note created successfully"}, 200
     
     except ValidationError as e:
-        return {"messages": "Invalid data", "errors": e.messages}, 400
+        return {"messages": "Invalid data", "errors": e.messages}, 422
 
 @note.put("/<id>")
 @jwt_required()

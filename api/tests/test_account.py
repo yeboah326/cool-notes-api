@@ -32,7 +32,7 @@ def test_account_create_error(client):
         json={"name": "John Doe", "email": "jdoe@gmail.com", "password": "123456789"},
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert response.json["errors"] == {
         "account_type": ["Missing data for required field."]
     }
@@ -84,7 +84,7 @@ def test_account_authenticate_errors(client):
 
     response = client.post("/api/account/auth", json={"email": "jdoe@gmail.com"})
 
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert response.json["message"] == "Invalid data"
 
     # Drop database

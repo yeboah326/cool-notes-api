@@ -20,7 +20,7 @@ def tag_create():
         db.session.add(new_tag)
         db.session.commit()
     except ValidationError as e:
-        return {"message": "Invalid data", "errors": e.messages}, 400
+        return {"message": "Invalid data", "errors": e.messages}, 422
 
     return {"message": f"{data['name']} created successfully"}, 200
 
@@ -59,7 +59,7 @@ def tag_update_by_id(id):
             tag.name = data["new_name"]
             db.session.commit()
     except KeyError:
-        return {"message": "A new name was not provided for the tag"}, 400
+        return {"message": "A new name was not provided for the tag"}, 422
 
     return {"message": "Tag updated successfully"}, 200
 
