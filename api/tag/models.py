@@ -6,7 +6,7 @@ class Tag(db.Model):
     __tablename__ = "cn_tag"
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False, unique=True)
     date_created = db.Column(db.DateTime, default=datetime.datetime.now())
     date_updated = db.Column(db.DateTime, default=datetime.datetime.now(), onupdate=datetime.datetime.now())
     author_id = db.Column(db.Integer, db.ForeignKey("cn_account.id", ondelete="cascade"), nullable=False)

@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from api.extensions import db
-from api.note.models import Note
+from api.note.models import Note, NoteTag
 from api.note.schemas import note_schema, notes_schema
+from api.tag.schemas import tag_schema
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow.exceptions import ValidationError
 
@@ -12,14 +13,35 @@ note = Blueprint("note",__name__, url_prefix="/api/note")
 def note_create():
     # Retrieve the incoming data
     data = request.get_json()
-    data["author_id"] = get_jwt_identity()
+
+    # Add author id to note
+    data["note"]["author_id"] = get_jwt_identity()
+
+    # Add author id to tags
+    for i in range(len(data["tags"])):
+        data["tags"][i]["author_id"] = get_jwt_identity()
 
     try:
         # Create a new note instance
-        new_note = note_schema.load(data)
+        new_note = note_schema.load(data["note"])
         
         # Add to the database
         db.session.add(new_note)
+        db.session.flush()
+        
+        #  Load the tags together with the note
+        if data["tags"]:
+            for tag in data["tags"]:
+                # Create and store the tag temporarily
+                new_tag = tag_schema.load(tag)
+                db.session.add(new_tag)
+                db.session.flush()
+
+                # Add note to tag
+                note_tag = NoteTag(note_id=new_note.id, tag_id=new_tag.id)
+                db.session.add(note_tag)
+                db.session.flush()
+
         db.session.commit()
 
         return {"message": "Note created successfully"}, 200

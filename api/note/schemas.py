@@ -15,5 +15,5 @@ class NoteSchema(Schema):
     def create_note(self, data, **kwargs):
         return Note(**data)
 
-note_schema = NoteSchema()
+note_schema = NoteSchema(unknown="EXCLUDE")
 notes_schema = NoteSchema(many=True)

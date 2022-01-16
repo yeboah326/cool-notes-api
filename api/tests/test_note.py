@@ -12,7 +12,7 @@ def test_note_create_successful(client):
 
     response = client.post(
         "/api/note/",
-        json={"title": "Test Note 1", "content": "Test Note 1 content"},
+        json={"note":{"title": "Test Note 1", "content": "Test Note 1 content"}, "tags":[{"name":"cool"}, {"name":"new"}]},
         headers={"Authorization": f"Bearer {user['token']}"},
     )
 
@@ -23,6 +23,7 @@ def test_note_create_successful(client):
     assert note["content"] == "Test Note 1 content"
     assert note["title"] == "Test Note 1"
     assert note["author"] == "John Doe"
+    assert len(note["tags"]) == 2
 
     # Truncate all database tables
     truncate_db()
@@ -220,6 +221,8 @@ def test_note_get_by_id_successful(client):
         f"/api/note/{note['id']}",
         headers={"Authorization": f"Bearer {user['token']}"},
     )
+
+    note = note_schema.dump(Note.query.filter_by(title="Test Note 1").first())
 
     assert response.status_code == 200
     assert response.json["note"]["title"] == "Test Note 1"

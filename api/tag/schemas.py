@@ -11,6 +11,6 @@ class TagSchema(Schema):
     def create_tag(self, data, **kwargs):
         return Tag(**data)
 
-tag_schema = TagSchema()
-tags_schema = TagSchema(many=True)
+tag_schema = TagSchema(unknown="EXCLUDE")
+tags_schema = TagSchema(many=True, unknown="EXCLUDE")
 

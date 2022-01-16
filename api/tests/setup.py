@@ -39,7 +39,7 @@ def create_user_login_token(client):
 def create_note(client, token):
     response = client.post(
         "/api/note/",
-        json={"title": "Test Note 1", "content": "Test Note 1 content"},
+        json={"note":{"title": "Test Note 1", "content": "Test Note 1 content"}, "tags":[{"name":"cool"}, {"name":"new"}]},
         headers={"Authorization": f"Bearer {token}"},
     )
     note = note_schema.dump(Note.query.filter_by(title="Test Note 1").first())

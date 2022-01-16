@@ -2,6 +2,7 @@ from marshmallow import Schema, fields
 import datetime
 from api.account.models import Account
 from api.tag.models import Tag, NoteTag
+from api.tag.schemas import tags_schema
 from api.extensions import db
 
 
@@ -22,7 +23,7 @@ class Note(db.Model):
     @property
     def tags(self) -> str:
         note_tags = NoteTag.query.filter_by(note_id=self.id).all()
-        tags = [Tag.find_by(note_tag.id) for note_tag in note_tags]
+        tags = tags_schema.dump(Tag.find_by_id(note_tag.tag_id) for note_tag in note_tags)
         return tags
     
     @classmethod
